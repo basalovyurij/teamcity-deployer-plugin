@@ -30,6 +30,7 @@ class FtpBuildProcessAdapter extends SyncBuildProcessAdapter {
   private static final Logger LOG = Logger.getInstance(FtpBuildProcessAdapter.class.getName());
   public static final int STREAM_BUFFER_SIZE = 5 * 1024 * 1024; // 5 Mb
   public static final int SOCKET_BUFFER_SIZE = 1024 * 1024; // 1 Mb
+  public static final int TIMEOUT = 100000000; // 
 
   private final String myTarget;
   private final String myUsername;
@@ -104,7 +105,7 @@ class FtpBuildProcessAdapter extends SyncBuildProcessAdapter {
         isAutoType = true;
       }
 
-      client.setControlKeepAliveTimeout(60); // seconds
+      //client.setControlKeepAliveTimeout(60); // seconds
       AtomicReference<BuildFinishedStatus> processResult = new AtomicReference<BuildFinishedStatus>(BuildFinishedStatus.FINISHED_SUCCESS);
       final Runnable interruptibleBody = new InterruptibleUploadProcess(client, myLogger, myArtifacts, isAutoType, path, processResult) {
         public boolean checkIsInterrupted() {
@@ -188,6 +189,14 @@ class FtpBuildProcessAdapter extends SyncBuildProcessAdapter {
 
     client.setBufferSize(FtpBuildProcessAdapter.STREAM_BUFFER_SIZE);
     client.setSendBufferSize(FtpBuildProcessAdapter.SOCKET_BUFFER_SIZE);
+    
+    client.setConnectTimeout(TIMEOUT);
+    client.setControlKeepAliveTimeout(TIMEOUT);
+    client.setControlKeepAliveReplyTimeout(TIMEOUT);
+    client.setDataTimeout(TIMEOUT);
+    client.setDefaultTimeout(TIMEOUT);
+    client.setSoTimeout(TIMEOUT);
+    
     return client;
   }
 
